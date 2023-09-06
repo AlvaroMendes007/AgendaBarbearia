@@ -14,21 +14,25 @@ import br.com.agenda.barbearia.dto.UsuarioRegisterDTO;
 import br.com.agenda.barbearia.model.Autenticacao;
 import br.com.agenda.barbearia.model.TipoUsuario;
 import br.com.agenda.barbearia.model.Usuario;
-import br.com.agenda.barbearia.repository.UsuarioRepository;
 import br.com.agenda.barbearia.security.TokenService;
+import br.com.agenda.barbearia.service.SenhaService;
 import br.com.agenda.barbearia.service.TipoUsuarioService;
 import br.com.agenda.barbearia.service.UsuarioService;
 
 @RestController
 @RequestMapping("auth")
 public class AutenticacaoController {
-	@Autowired
-	private UsuarioRepository usuarioRepository;
 
 	@Autowired
 	private TokenService tokenService;
 	
+	@Autowired
+	private SenhaService senhaService;
+	
+	@Autowired
 	private UsuarioService usuarioService;
+	
+	@Autowired
 	private TipoUsuarioService tipoUsuarioService;
 
 	@PostMapping("/login")
@@ -64,12 +68,10 @@ public class AutenticacaoController {
 	}
 
 	private Autenticacao validarLogin(UsuarioLoginDTO usuarioRequisicao) {
-		String senhaCriptografadaDoBanco = usuarioRepository
-				.getSenhaCriptografadaPorEmail(usuarioRequisicao.getEmail());
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String senhaCriptografadaDoBanco = senhaService.obterSenhaCriptografadaPorEmail(usuarioRequisicao.getEmail());
 		Autenticacao autenticacao = new Autenticacao();
 
-		if (!encoder.matches(usuarioRequisicao.getSenha(), senhaCriptografadaDoBanco)) {
+		if (!senhaService.verificarSenha(usuarioRequisicao.getSenha(), senhaCriptografadaDoBanco)){
 			return null;
 		}
 

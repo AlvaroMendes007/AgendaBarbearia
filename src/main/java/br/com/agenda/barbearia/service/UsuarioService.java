@@ -9,7 +9,10 @@ import br.com.agenda.barbearia.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
+	@Autowired
 	private final UsuarioRepository usuarioRepository;
+	
+	@Autowired
 	private final SenhaService senhaService;
 	
     @Autowired

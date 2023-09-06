@@ -16,6 +16,7 @@ import br.com.agenda.barbearia.service.UsuarioService;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
+	@Autowired
 	private final UsuarioService usuarioService;
 
     @Autowired
