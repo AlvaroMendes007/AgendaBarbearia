@@ -3,6 +3,7 @@ package br.com.agenda.barbearia.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
 import br.com.agenda.barbearia.model.TipoUsuario;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.repository.UsuarioRepository;
@@ -21,11 +22,15 @@ public class UsuarioService {
         this.senhaService = senhaService;
     }
 	
-	public Usuario criarUsuario(Usuario usuario, TipoUsuario tipoUsuario) {
-        String senhaCriptografada = senhaService.criptografarSenha(usuario.getSenha());
-        usuario.setSenha(senhaCriptografada);
-		usuario.getTipoUsuario().setId(tipoUsuario.getId());
-	    return usuarioRepository.save(usuario);
+	public void criarUsuario(Usuario usuario, TipoUsuarioEnum tipoUsuarioEnum) {
+        if (!verificarEmailDuplicado(usuario.getEmail())) {
+        	String senhaCriptografada = senhaService.criptografarSenha(usuario.getSenha());
+            usuario.setSenha(senhaCriptografada);
+            TipoUsuario tipoUsuario = new TipoUsuario();
+            tipoUsuario.setId(tipoUsuarioEnum.getKey());
+            usuario.setTipoUsuario(tipoUsuario);	
+            usuarioRepository.save(usuario);
+        }
 	}
 	
 	public boolean verificarEmailDuplicado(String email) {

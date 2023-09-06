@@ -3,7 +3,6 @@ package br.com.agenda.barbearia.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity.BodyBuilder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.agenda.barbearia.dto.UsuarioLoginDTO;
 import br.com.agenda.barbearia.dto.UsuarioRegisterDTO;
 import br.com.agenda.barbearia.model.Autenticacao;
-import br.com.agenda.barbearia.model.TipoUsuario;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.security.TokenService;
 import br.com.agenda.barbearia.service.SenhaService;
@@ -31,9 +29,6 @@ public class AutenticacaoController {
 	
 	@Autowired
 	private UsuarioService usuarioService;
-	
-	@Autowired
-	private TipoUsuarioService tipoUsuarioService;
 
 	@PostMapping("/login")
 	public ResponseEntity<Autenticacao> login(@RequestBody UsuarioLoginDTO data) {
@@ -55,10 +50,8 @@ public class AutenticacaoController {
 	        return ResponseEntity.badRequest().build();
 	    }
 
-	    TipoUsuario tipoUsuario = tipoUsuarioService.obterTipoUsuarioPorId(data.getTipoUsuario().getKey());
 	    Usuario usuarioCriado = new Usuario(data.getEmail(), data.getSenha());
-	    
-	    usuarioService.criarUsuario(usuarioCriado, tipoUsuario);
+	    usuarioService.criarUsuario(usuarioCriado, data.getTipoUsuario());
 
 	    return ResponseEntity.ok().build();
 	}
