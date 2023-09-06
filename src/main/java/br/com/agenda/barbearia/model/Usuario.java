@@ -36,12 +36,6 @@ public class Usuario {
 	@JoinColumn(name = "fk_id_tipo_usuario")
 	private TipoUsuario tipoUsuario;
 
-	public Usuario(String email, String senha, TipoUsuario tipoUsuario) {
-		this.senha = senha;
-		this.email = email;
-		this.tipoUsuario = tipoUsuario;
-	}
-
 	public Usuario(String email, String senha) {
 		this.senha = senha;
 		this.email = email;

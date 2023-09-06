@@ -31,7 +31,7 @@ public class SegurancaConfig {
 				.authorizeHttpRequests(authorize -> authorize
 						.antMatchers(HttpMethod.POST, "/auth/login").permitAll()
 						.antMatchers(HttpMethod.POST, "/auth/register").permitAll()
-						.antMatchers(HttpMethod.POST, "/usuarios").hasRole(TipoUsuarioEnum.ADMIN.getValue())
+						.antMatchers(HttpMethod.POST, "/usuarios").hasAnyRole(TipoUsuarioEnum.ADMIN.getValue(), TipoUsuarioEnum.ADMIN_BARBEARIA.getValue())
 						.anyRequest().authenticated()
 				)
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

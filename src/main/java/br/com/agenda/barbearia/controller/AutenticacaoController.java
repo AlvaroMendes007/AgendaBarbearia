@@ -1,6 +1,7 @@
 package br.com.agenda.barbearia.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.RequestEntity.BodyBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,9 +14,10 @@ import br.com.agenda.barbearia.dto.UsuarioRegisterDTO;
 import br.com.agenda.barbearia.model.Autenticacao;
 import br.com.agenda.barbearia.model.TipoUsuario;
 import br.com.agenda.barbearia.model.Usuario;
-import br.com.agenda.barbearia.repository.TipoUsuarioRepository;
 import br.com.agenda.barbearia.repository.UsuarioRepository;
 import br.com.agenda.barbearia.security.TokenService;
+import br.com.agenda.barbearia.service.TipoUsuarioService;
+import br.com.agenda.barbearia.service.UsuarioService;
 
 @RestController
 @RequestMapping("auth")
@@ -24,10 +26,10 @@ public class AutenticacaoController {
 	private UsuarioRepository usuarioRepository;
 
 	@Autowired
-	private TipoUsuarioRepository tipoUsuarioRepository;
-
-	@Autowired
 	private TokenService tokenService;
+	
+	private UsuarioService usuarioService;
+	private TipoUsuarioService tipoUsuarioService;
 
 	@PostMapping("/login")
 	public ResponseEntity<Autenticacao> login(@RequestBody UsuarioLoginDTO data) {
@@ -40,8 +42,8 @@ public class AutenticacaoController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody UsuarioRegisterDTO data) {
-	    if (usuarioRepository.findByEmail(data.getEmail()) != null) {
+	public ResponseEntity<BodyBuilder> register(@RequestBody UsuarioRegisterDTO data) {
+	    if (usuarioService.verificarEmailDuplicado(data.getEmail())) {
 	        return ResponseEntity.badRequest().build();
 	    }
 
@@ -49,12 +51,10 @@ public class AutenticacaoController {
 	        return ResponseEntity.badRequest().build();
 	    }
 
-	    String senhaCriptografada = new BCryptPasswordEncoder().encode(data.getSenha());
-	    TipoUsuario tipoUsuario = tipoUsuarioRepository.findById(new Long(data.getTipoUsuario().getKey()))
-	            .orElseThrow(() -> new RuntimeException("Tipo de usuário não encontrado com o ID fornecido"));
-
-	    Usuario usuarioCriado = new Usuario(data.getEmail(), senhaCriptografada, tipoUsuario);
-	    usuarioRepository.save(usuarioCriado);
+	    TipoUsuario tipoUsuario = tipoUsuarioService.obterTipoUsuarioPorId(data.getTipoUsuario().getKey());
+	    Usuario usuarioCriado = new Usuario(data.getEmail(), data.getSenha());
+	    
+	    usuarioService.criarUsuario(usuarioCriado, tipoUsuario);
 
 	    return ResponseEntity.ok().build();
 	}
