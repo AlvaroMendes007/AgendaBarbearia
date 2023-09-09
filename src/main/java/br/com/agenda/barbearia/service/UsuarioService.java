@@ -1,19 +1,16 @@
 package br.com.agenda.barbearia.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
 import br.com.agenda.barbearia.model.TipoUsuario;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.repository.UsuarioRepository;
+import br.com.agenda.barbearia.util.RoleUtil;
 
 @Service
 public class UsuarioService {
-	
-	private static final String ROLE_ADMIN = "ROLE_ADMIN";
-	private static final String ROLE_ADMIN_BARBEARIA = "ROLE_ADMIN_BARBEARIA";
 
 	@Autowired
 	private final UsuarioRepository usuarioRepository;
@@ -21,14 +18,17 @@ public class UsuarioService {
 	@Autowired
 	private final SenhaService senhaService;
 
+	private final RoleUtil roleUtil;
+	
 	@Autowired
-	public UsuarioService(UsuarioRepository usuarioRepository, SenhaService senhaService) {
+	public UsuarioService(UsuarioRepository usuarioRepository, SenhaService senhaService, RoleUtil roleUtil) {
 		this.usuarioRepository = usuarioRepository;
 		this.senhaService = senhaService;
+		this.roleUtil = roleUtil;
 	}
 
 	public void criarUsuario(Usuario usuario, TipoUsuarioEnum tipoUsuarioEnum) {
-        boolean usuarioTemTipoAdminBarbearia = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> ROLE_ADMIN_BARBEARIA.equals(role.getAuthority()));
+        boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminRole();
         
 		if (!verificarEmailDuplicado(usuario.getEmail())) {
 			TipoUsuario tipoUsuario = new TipoUsuario();
@@ -55,8 +55,8 @@ public class UsuarioService {
 	}
 
 	public void deletarUsuario(Usuario usuario) throws Exception {
-		boolean usuarioTemTipoAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> ROLE_ADMIN.equals(role.getAuthority()));
-        boolean usuarioTemTipoAdminBarbearia = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> ROLE_ADMIN_BARBEARIA.equals(role.getAuthority()));
+		boolean usuarioTemTipoAdmin = roleUtil.possuiAdminRole();
+        boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminBarbeariaRole();
         
 		if (usuarioTemTipoAdmin) {
 	        usuarioRepository.delete(usuario);
