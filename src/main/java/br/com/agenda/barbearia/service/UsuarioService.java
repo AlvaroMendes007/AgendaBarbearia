@@ -14,10 +14,7 @@ public class UsuarioService {
 	
 	private static final String ROLE_ADMIN = "ROLE_ADMIN";
 	private static final String ROLE_ADMIN_BARBEARIA = "ROLE_ADMIN_BARBEARIA";
-	
-    private boolean usuarioTemTipoAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> ROLE_ADMIN.equals(role.getAuthority()));
-	private boolean usuarioTemTipoAdminBarbearia = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> ROLE_ADMIN_BARBEARIA.equals(role.getAuthority()));
-	
+
 	@Autowired
 	private final UsuarioRepository usuarioRepository;
 
@@ -31,6 +28,8 @@ public class UsuarioService {
 	}
 
 	public void criarUsuario(Usuario usuario, TipoUsuarioEnum tipoUsuarioEnum) {
+        boolean usuarioTemTipoAdminBarbearia = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> ROLE_ADMIN_BARBEARIA.equals(role.getAuthority()));
+        
 		if (!verificarEmailDuplicado(usuario.getEmail())) {
 			TipoUsuario tipoUsuario = new TipoUsuario();
 			if (usuarioTemTipoAdminBarbearia) {
@@ -56,6 +55,9 @@ public class UsuarioService {
 	}
 
 	public void deletarUsuario(Usuario usuario) throws Exception {
+		boolean usuarioTemTipoAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> ROLE_ADMIN.equals(role.getAuthority()));
+        boolean usuarioTemTipoAdminBarbearia = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().anyMatch(role -> ROLE_ADMIN_BARBEARIA.equals(role.getAuthority()));
+        
 		if (usuarioTemTipoAdmin) {
 	        usuarioRepository.delete(usuario);
 	    } else {
