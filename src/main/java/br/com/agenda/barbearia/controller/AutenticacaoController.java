@@ -14,7 +14,6 @@ import br.com.agenda.barbearia.model.Autenticacao;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.security.TokenService;
 import br.com.agenda.barbearia.service.SenhaService;
-import br.com.agenda.barbearia.service.TipoUsuarioService;
 import br.com.agenda.barbearia.service.UsuarioService;
 
 @RestController
