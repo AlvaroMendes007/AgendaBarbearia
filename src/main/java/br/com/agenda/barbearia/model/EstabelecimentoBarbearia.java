@@ -26,4 +26,11 @@ public class EstabelecimentoBarbearia {
 	@OneToOne
 	@JoinColumn(name = "fk_id_endereco")
 	private Endereco enderecoBarbearia;
+	
+	public EstabelecimentoBarbearia () {}
+
+	public EstabelecimentoBarbearia(String nome, Endereco enderecoBarbearia) {
+		this.nome = nome;
+		this.enderecoBarbearia = enderecoBarbearia;
+	}
 }

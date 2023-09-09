@@ -14,7 +14,7 @@ import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.service.UsuarioService;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("usuarios")
 public class UsuarioController {
 
 	@Autowired

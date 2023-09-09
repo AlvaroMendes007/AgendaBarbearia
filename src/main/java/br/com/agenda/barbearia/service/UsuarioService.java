@@ -75,6 +75,10 @@ public class UsuarioService {
 			}
 		}
 	}
+	
+	public Usuario buscarUsuarioPorId(Long idUsuario) {
+		return usuarioRepository.findById(idUsuario).orElse(null);
+	}
 
 	public boolean verificarEmailDuplicado(String email) {
 		return usuarioRepository.findByEmail(email) != null;
