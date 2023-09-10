@@ -1,5 +1,7 @@
 package br.com.agenda.barbearia.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,4 +15,13 @@ public enum TipoUsuarioEnum {
 	
 	private final Integer key;
     private final String value;
+    
+    public static TipoUsuarioEnum fromValue(String value) {
+        for (TipoUsuarioEnum tipo : values()) {
+            if (tipo.value.equalsIgnoreCase(value)) {
+                return tipo;
+            }
+        }
+        return null;
+    }
 }

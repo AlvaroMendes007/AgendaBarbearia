@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
+import br.com.agenda.barbearia.exception.EmailDuplicadoException;
 import br.com.agenda.barbearia.exception.SemPermissaoExcluirTipoException;
 import br.com.agenda.barbearia.exception.SemPermissaoExecutarAcaoException;
 import br.com.agenda.barbearia.exception.UsuarioNaoEncontradoException;
@@ -30,7 +31,7 @@ public class UsuarioService {
 		this.roleUtil = roleUtil;
 	}
 
-	public void criarUsuario(Usuario usuario, TipoUsuarioEnum tipoUsuarioEnum) {
+	public Usuario criarUsuario(Usuario usuario, TipoUsuarioEnum tipoUsuarioEnum) {
         boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminRole();
         
 		if (!verificarEmailDuplicado(usuario.getEmail())) {
@@ -42,7 +43,9 @@ public class UsuarioService {
 			usuario.setSenha(senhaCriptografada);
 			tipoUsuario.setId(tipoUsuarioEnum.getKey());
 			usuario.setTipoUsuario(tipoUsuario);
-			usuarioRepository.save(usuario);
+			return usuarioRepository.save(usuario);
+		} else {
+			throw new EmailDuplicadoException();
 		}
 	}
 
