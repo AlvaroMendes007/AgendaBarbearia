@@ -31,7 +31,7 @@ public class RespostaService {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resposta);
     }
 
-	public ResponseEntity<?> criarRespostaRemocaoFuncionario(String mensagem) {
+	public ResponseEntity<?> criarRespostaSucessoRemocao(String mensagem) {
 		Resposta<Autenticacao> resposta = new Resposta<>();
         resposta.setCodigo(HttpStatus.OK.value());
         resposta.setMensagem(mensagem);

@@ -30,7 +30,6 @@ public class EstabelecimentoBarbeariaService {
 				.orElseThrow(() -> new EstabelecimentoNaoEncontradoException());
 
 		barbeariaExistente.setNome(barbearia.getNome());
-		barbeariaExistente.setEnderecoBarbearia(barbearia.getEnderecoBarbearia());
 		
 		estabelecimentoBarbeariaRepository.save(barbeariaExistente);
 	}
@@ -43,6 +42,7 @@ public class EstabelecimentoBarbeariaService {
 	}
 	
 	public EstabelecimentoBarbearia buscarEstabelecimentoPorId(Long id) {
-		return estabelecimentoBarbeariaRepository.findById(id).orElse(null);
+		return estabelecimentoBarbeariaRepository.findById(id)
+				.orElseThrow(() -> new EstabelecimentoNaoEncontradoException());
 	}
 };

@@ -100,7 +100,7 @@ public class FuncionarioBarbeariaController {
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			funcionarioBarbeariaService.deletarFuncionarioBarbearia(id);
-			return respostaService.criarRespostaRemocaoFuncionario("Funcionário removido com sucesso!");
+			return respostaService.criarRespostaSucessoRemocao("Funcionário removido com sucesso!");
 		} catch(FuncionarioNaoEncontradoException e) {
 			return respostaService.criarRespostaNotFound(e.getMessage());
 		} catch(SemPermissaoExecutarAcaoException e) {
