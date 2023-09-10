@@ -54,18 +54,17 @@ public class UsuarioService {
 		usuarioRepository.save(usuarioExistente);
 	}
 
-	public void deletarUsuario(Usuario usuario) throws Exception {
+	public void deletarUsuario(Long id) throws Exception {
 		boolean usuarioTemTipoAdmin = roleUtil.possuiAdminRole();
         boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminBarbeariaRole();
+        Usuario usuarioExistente = usuarioRepository.findById(id).orElseThrow(() -> new Exception("Usuário não encontrado"));
+        boolean tipoUsuarioBarbeiro = TipoUsuarioEnum.BARBEIRO.getValue().equals(usuarioExistente.getTipoUsuario().getTipo());
         
 		if (usuarioTemTipoAdmin) {
-	        usuarioRepository.delete(usuario);
+	        usuarioRepository.delete(usuarioExistente);
 	    } else {
 			if (usuarioTemTipoAdminBarbearia) {
-			    Usuario usuarioExistente = usuarioRepository.findById(usuario.getId())
-			            .orElseThrow(() -> new Exception("Usuário não encontrado"));
-
-			    if (TipoUsuarioEnum.BARBEIRO.getValue().equals(usuarioExistente.getTipoUsuario().getTipo())) {
+				if (tipoUsuarioBarbeiro) {
 			        usuarioRepository.delete(usuarioExistente);
 			    } else {
 			        throw new Exception("Sem permissão para excluir este tipo de usuário" + usuarioExistente.getTipoUsuario().getTipo());

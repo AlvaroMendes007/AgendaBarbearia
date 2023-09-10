@@ -33,15 +33,15 @@ public class UsuarioController {
 
 	@PutMapping("/{id}")
 	public void alterarUsuario(@PathVariable Long id, @RequestBody UsuarioRegisterDTO usuarioDTO) throws Exception {
-		Usuario usuario = new Usuario(usuarioDTO.getEmail(), usuarioDTO.getSenha());
+		Usuario usuario = new Usuario();
 		usuario.setId(id);
+		usuario.setEmail(usuarioDTO.getEmail());
+		usuario.setSenha(usuarioDTO.getSenha());
 		usuarioService.alterarUsuario(usuario);
 	}
 
 	@DeleteMapping("/{id}")
 	public void deletarUsuario(@PathVariable Long id) throws Exception {
-		Usuario usuario = new Usuario();
-		usuario.setId(id);
-		usuarioService.deletarUsuario(usuario);
+		usuarioService.deletarUsuario(id);
 	}
 }
