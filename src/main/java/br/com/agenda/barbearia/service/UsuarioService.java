@@ -49,7 +49,7 @@ public class UsuarioService {
 		}
 	}
 
-	public void alterarUsuario(Usuario usuario) {
+	public Usuario alterarUsuario(Usuario usuario) {
 		Usuario usuarioExistente = usuarioRepository.findById(usuario.getId())
 				.orElseThrow(() -> new UsuarioNaoEncontradoException());
 
@@ -57,7 +57,7 @@ public class UsuarioService {
 		usuarioExistente.setEmail(usuario.getEmail());
 		usuarioExistente.setSenha(senhaCriptografada);
 		
-		usuarioRepository.save(usuarioExistente);
+		return usuarioRepository.saveAndFlush(usuarioExistente);
 	}
 
 	public void deletarUsuario(Long id) {

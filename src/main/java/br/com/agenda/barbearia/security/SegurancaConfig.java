@@ -14,8 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
-
 @Configuration
 @EnableWebSecurity
 public class SegurancaConfig {
@@ -31,7 +29,6 @@ public class SegurancaConfig {
 				.authorizeHttpRequests(authorize -> authorize
 						.antMatchers(HttpMethod.POST, "/auth/login").permitAll()
 						.antMatchers(HttpMethod.POST, "/auth/register").permitAll()
-						.antMatchers(HttpMethod.POST, "/usuarios").hasAnyRole(TipoUsuarioEnum.ADMIN.getValue(), TipoUsuarioEnum.ADMIN_BARBEARIA.getValue())
 						.anyRequest().authenticated()
 				)
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
