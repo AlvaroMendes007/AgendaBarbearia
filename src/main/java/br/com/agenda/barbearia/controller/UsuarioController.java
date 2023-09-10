@@ -40,7 +40,7 @@ public class UsuarioController {
 	}
 
 	@PutMapping("/{id}")
-	public void alterarUsuario(@PathVariable Long id, @RequestBody UsuarioRegisterDTO usuarioDTO) throws Exception {
+	public void alterarUsuario(@PathVariable Long id, @RequestBody UsuarioRegisterDTO usuarioDTO) {
 		Usuario usuario = new Usuario();
 		usuario.setId(id);
 		usuario.setEmail(usuarioDTO.getEmail());
@@ -49,7 +49,7 @@ public class UsuarioController {
 	}
 
 	@DeleteMapping("/{id}")
-	public void deletarUsuario(@PathVariable Long id) throws Exception {
+	public void deletarUsuario(@PathVariable Long id){
 		usuarioService.deletarUsuario(id);
 	}
 }

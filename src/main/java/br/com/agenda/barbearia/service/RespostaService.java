@@ -2,10 +2,12 @@ package br.com.agenda.barbearia.service;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import br.com.agenda.barbearia.model.Autenticacao;
 import br.com.agenda.barbearia.model.Resposta;
 
+@Service
 public class RespostaService {
 	
 	public ResponseEntity<Resposta<Autenticacao>> criarRespostaBadRequest(String mensagem) {
@@ -34,5 +36,12 @@ public class RespostaService {
         resposta.setCodigo(HttpStatus.OK.value());
         resposta.setMensagem(mensagem);
         return ResponseEntity.status(HttpStatus.OK).body(resposta);
+	}
+	
+	public ResponseEntity<?> criarRespostaForbidden(String mensagem) {
+		Resposta<Autenticacao> resposta = new Resposta<>();
+        resposta.setCodigo(HttpStatus.FORBIDDEN.value());
+        resposta.setMensagem(mensagem);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(resposta);
 	}
 }

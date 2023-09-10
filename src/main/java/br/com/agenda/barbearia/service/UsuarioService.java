@@ -49,7 +49,7 @@ public class UsuarioService {
 		}
 	}
 
-	public void alterarUsuario(Usuario usuario) throws Exception {
+	public void alterarUsuario(Usuario usuario) {
 		Usuario usuarioExistente = usuarioRepository.findById(usuario.getId())
 				.orElseThrow(() -> new UsuarioNaoEncontradoException());
 
@@ -60,10 +60,11 @@ public class UsuarioService {
 		usuarioRepository.save(usuarioExistente);
 	}
 
-	public void deletarUsuario(Long id) throws Exception {
+	public void deletarUsuario(Long id) {
 		boolean usuarioTemTipoAdmin = roleUtil.possuiAdminRole();
         boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminBarbeariaRole();
-        Usuario usuarioExistente = usuarioRepository.findById(id).orElseThrow(() -> new Exception("Usuário não encontrado"));
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+        		.orElseThrow(() -> new UsuarioNaoEncontradoException());
         boolean tipoUsuarioBarbeiro = TipoUsuarioEnum.BARBEIRO.getValue().equals(usuarioExistente.getTipoUsuario().getTipo());
         
 		if (usuarioTemTipoAdmin) {

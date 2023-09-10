@@ -23,12 +23,12 @@ public class FuncionarioBarbeariaService {
 		this.funcionarioBarbeariaRepository = funcionarioBarbeariaRepository;
 	}
 
-	public void criarFuncionario(FuncionarioBarbearia funcionarioBarbearia) throws Exception {
+	public void criarFuncionario(FuncionarioBarbearia funcionarioBarbearia)  {
 		validacaoFuncionario(funcionarioBarbearia);        
        	funcionarioBarbeariaRepository.save(funcionarioBarbearia);
 	}
 	
-	public void alterarFuncionario(FuncionarioBarbearia funcionarioBarbearia) throws Exception {
+	public void alterarFuncionario(FuncionarioBarbearia funcionarioBarbearia){
 		FuncionarioBarbearia funcionarioExistente = funcionarioBarbeariaRepository.findById(funcionarioBarbearia.getId())
 				.orElseThrow(() -> new FuncionarioNaoEncontradoException());
 		
@@ -40,14 +40,14 @@ public class FuncionarioBarbeariaService {
        	funcionarioBarbeariaRepository.save(funcionarioExistente);
 	}
 	
-	public void deletarFuncionarioBarbearia(Long id) throws Exception {
+	public void deletarFuncionarioBarbearia(Long id) {
 		FuncionarioBarbearia funcionarioExistente = funcionarioBarbeariaRepository.findById(id)
 				.orElseThrow(() -> new FuncionarioNaoEncontradoException());
 		
 		funcionarioBarbeariaRepository.delete(funcionarioExistente);
 	}
 	
-	private void validacaoFuncionario(FuncionarioBarbearia funcionarioBarbearia) throws Exception {
+	private void validacaoFuncionario(FuncionarioBarbearia funcionarioBarbearia) {
 		if (funcionarioBarbearia.getEstabelecimentoBarbearia() == null) {
 			throw new EstabelecimentoNaoEncontradoException();
 		}
