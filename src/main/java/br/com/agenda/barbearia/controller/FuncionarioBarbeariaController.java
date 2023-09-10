@@ -27,9 +27,9 @@ import br.com.agenda.barbearia.model.FuncionarioBarbearia;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.service.EstabelecimentoBarbeariaService;
 import br.com.agenda.barbearia.service.FuncionarioBarbeariaService;
+import br.com.agenda.barbearia.service.PermissaoService;
 import br.com.agenda.barbearia.service.RespostaService;
 import br.com.agenda.barbearia.service.UsuarioService;
-import br.com.agenda.barbearia.util.RoleUtil;
 import br.com.agenda.barbearia.util.StringUtil;
 
 @RestController
@@ -46,7 +46,7 @@ public class FuncionarioBarbeariaController {
 	private UsuarioService usuarioService;
 	
 	@Autowired
-	private RoleUtil roleUtil;
+	private PermissaoService permissaoService;
 	
 	@Autowired
 	private StringUtil stringUtil;
@@ -54,10 +54,11 @@ public class FuncionarioBarbeariaController {
 	@Autowired
 	private RespostaService respostaService;
 	
+	
 	@PostMapping
 	public ResponseEntity<?> criarFuncionario(@RequestBody FuncionarioBarbeariaDTO funcionarioDTO) {
 		try {
-			validarPermissao();
+			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			validarPreenchimentoDTO(funcionarioDTO);
 	        
 	        FuncionarioBarbearia funcionarioNovo = setFuncionario(funcionarioDTO);
@@ -78,7 +79,7 @@ public class FuncionarioBarbeariaController {
 	@PutMapping("/{id}") 
 	public ResponseEntity<?> alterarFuncionario(@PathVariable Long id, @RequestBody FuncionarioBarbeariaDTO funcionarioDTO) {
 		try{
-			validarPermissao();
+			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			FuncionarioBarbearia funcionario = new FuncionarioBarbearia();
 			funcionario.setId(id);
 			funcionario.setNome(funcionarioDTO.getNome());
@@ -97,7 +98,7 @@ public class FuncionarioBarbeariaController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deletarFuncionario(@PathVariable Long id) {
 		try {
-			validarPermissao();
+			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			funcionarioBarbeariaService.deletarFuncionarioBarbearia(id);
 			return respostaService.criarRespostaRemocaoFuncionario("Funcionário removido com sucesso!");
 		} catch(FuncionarioNaoEncontradoException e) {
@@ -110,7 +111,7 @@ public class FuncionarioBarbeariaController {
 	@GetMapping("/{id}")
 	public ResponseEntity<?> buscarFuncionarioPorId(@PathVariable Long id) {
 		try {
-			validarPermissao();
+			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			FuncionarioBarbearia funcionario = funcionarioBarbeariaService.buscarFuncionarioPorId(id);
 			return ResponseEntity.ok(funcionario);			
 		} catch (FuncionarioNaoEncontradoException e) {
@@ -123,7 +124,7 @@ public class FuncionarioBarbeariaController {
 	@GetMapping("/tipo")
 	public ResponseEntity<?> buscarFuncionarioPorTipo(@RequestParam(name = "tipoUsuario") String tipoUsuarioParam) {
 		try {
-			validarPermissao();
+			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			TipoUsuarioEnum tipoUsuario = validarEnum(tipoUsuarioParam);
 			List<FuncionarioBarbearia> funcionarios = funcionarioBarbeariaService.buscarFuncionarioPorTipo(tipoUsuario);
 			return ResponseEntity.ok(funcionarios);
@@ -168,15 +169,6 @@ public class FuncionarioBarbeariaController {
         }
         if (funcionarioDTO.getEstabelecimentoId() == null) {
         	throw new CampoNaoPreenchidoException("Estabelecimento não preenchido");
-        }
-	}
-	
-	private void validarPermissao(){
-		boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminBarbeariaRole();
-        boolean usuarioTemTipoAdmin = roleUtil.possuiAdminRole();
-		
-        if (!usuarioTemTipoAdmin && !usuarioTemTipoAdminBarbearia) {
-        	throw new SemPermissaoExecutarAcaoException();
         }
 	}
 }

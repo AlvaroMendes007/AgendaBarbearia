@@ -32,7 +32,7 @@ public class UsuarioService {
 	}
 
 	public Usuario criarUsuario(Usuario usuario, TipoUsuarioEnum tipoUsuarioEnum) {
-        boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminRole();
+        boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminBarbeariaRole();
         
 		if (!verificarEmailDuplicado(usuario.getEmail())) {
 			TipoUsuario tipoUsuario = new TipoUsuario();

@@ -11,10 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.agenda.barbearia.dto.EnderecoDTO;
 import br.com.agenda.barbearia.dto.EstabelecimentoBarbeariaDTO;
+import br.com.agenda.barbearia.exception.SemPermissaoExecutarAcaoException;
 import br.com.agenda.barbearia.model.Endereco;
 import br.com.agenda.barbearia.model.EstabelecimentoBarbearia;
 import br.com.agenda.barbearia.service.EstabelecimentoBarbeariaService;
-import br.com.agenda.barbearia.util.RoleUtil;
+import br.com.agenda.barbearia.service.PermissaoService;
 
 @RestController
 @RequestMapping("estabelecimentoBarbearia")
@@ -24,16 +25,11 @@ public class EstabelecimentoBarbeariaController {
 	private EstabelecimentoBarbeariaService estabelecimentoBarbeariaService;  
 	
 	@Autowired
-	private RoleUtil roleUtil;
+	private PermissaoService permissaoService;
 	
 	@PostMapping
-	public void criarEstabelecimento(@RequestBody EstabelecimentoBarbeariaDTO barbeariaDTO) throws Exception {
-		boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminBarbeariaRole();
-		boolean usuarioTemTipoAdmin = roleUtil.possuiAdminRole();
-		
-		if (!usuarioTemTipoAdmin && !usuarioTemTipoAdminBarbearia) {
-			throw new Exception("Você não tem permissão para realizar essa ação!");
-		}
+	public void criarEstabelecimento(@RequestBody EstabelecimentoBarbeariaDTO barbeariaDTO){
+		permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 		
 		EnderecoDTO enderecoDTO = new EnderecoDTO();
 		enderecoDTO = barbeariaDTO.getEndereco();
@@ -52,12 +48,7 @@ public class EstabelecimentoBarbeariaController {
 	
 	@PutMapping("/{id}")
 	public void alterarEstabelecimento(@PathVariable Long id, @RequestBody EstabelecimentoBarbeariaDTO barbeariaDTO) throws Exception {
-		boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminBarbeariaRole();
-		boolean usuarioTemTipoAdmin = roleUtil.possuiAdminRole();
-		
-		if (!usuarioTemTipoAdmin && !usuarioTemTipoAdminBarbearia) {
-			throw new Exception("Você não tem permissão para realizar essa ação!");
-		}
+		permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 		
 		EstabelecimentoBarbearia estabelecimento = new EstabelecimentoBarbearia();
 		estabelecimento.setId(id);

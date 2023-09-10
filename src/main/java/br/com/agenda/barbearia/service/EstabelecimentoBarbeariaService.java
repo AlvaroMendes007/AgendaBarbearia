@@ -17,7 +17,7 @@ public class EstabelecimentoBarbeariaService {
 	@Autowired
 	private EstabelecimentoBarbeariaRepository estabelecimentoBarbeariaRepository;
 
-	public void criarEstabelecimentoBarbearia(EstabelecimentoBarbearia barbearia) throws Exception {
+	public void criarEstabelecimentoBarbearia(EstabelecimentoBarbearia barbearia){
 		Endereco endereco = barbearia.getEnderecoBarbearia();
 		endereco = enderecoService.criarEndereco(endereco);
 		barbearia.setEnderecoBarbearia(endereco);
@@ -25,7 +25,7 @@ public class EstabelecimentoBarbeariaService {
 		estabelecimentoBarbeariaRepository.save(barbearia);
 	}
 
-	public void alterarEstabelecimentoBarbearia(EstabelecimentoBarbearia barbearia) throws Exception {
+	public void alterarEstabelecimentoBarbearia(EstabelecimentoBarbearia barbearia) {
 		EstabelecimentoBarbearia barbeariaExistente = estabelecimentoBarbeariaRepository.findById(barbearia.getId())
 				.orElseThrow(() -> new EstabelecimentoNaoEncontradoException());
 
@@ -35,7 +35,7 @@ public class EstabelecimentoBarbeariaService {
 		estabelecimentoBarbeariaRepository.save(barbeariaExistente);
 	}
 
-	public void deletarEstabelecimentoBarbearia(Long id) throws Exception {
+	public void deletarEstabelecimentoBarbearia(Long id) {
 		EstabelecimentoBarbearia barbeariaExistente = estabelecimentoBarbeariaRepository.findById(id)
 				.orElseThrow(() -> new EstabelecimentoNaoEncontradoException());
 		
