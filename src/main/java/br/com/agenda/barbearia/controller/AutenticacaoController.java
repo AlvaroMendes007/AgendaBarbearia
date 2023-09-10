@@ -27,6 +27,8 @@ import br.com.agenda.barbearia.util.StringUtil;
 public class AutenticacaoController {
 
 	private static final String CAMPOS_OBRIGATORIOS_NAO_PREENCHIDOS = "Os campos obrigatórios não estão preenchidos!";
+	
+	ResponseEntity<?> responseEntity;
 
 	@Autowired
 	private TokenService tokenService;
@@ -45,26 +47,31 @@ public class AutenticacaoController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody UsuarioLoginDTO data) {
+		responseEntity = null;
 		try {
 			Autenticacao autenticacaoLogin = validarLogin(data);
-			return ResponseEntity.ok(autenticacaoLogin);
+			responseEntity = ResponseEntity.ok(autenticacaoLogin);
 		} catch (LoginInvalidoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		}
+		return responseEntity;
 	}
 
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody UsuarioRegisterDTO data) {
+		responseEntity = null;
 		try {
 			TipoUsuarioEnum tipoUsuario = TipoUsuarioEnum.fromValue(data.getTipoUsuarioString());
 			validarCadastroUsuario(data, tipoUsuario);
 			Usuario usuarioCriado = new Usuario(data.getEmail(), data.getSenha());
 			usuarioService.criarUsuario(usuarioCriado, tipoUsuario);
 
-			return ResponseEntity.ok(usuarioCriado);
+			responseEntity = ResponseEntity.ok(usuarioCriado);
 		} catch (EmailDuplicadoException | CampoNaoPreenchidoException | TipoUsuarioNaoEncontradoException e) {
-			return respostaService.criarRespostaBadRequest(e.getMessage());
+			responseEntity = respostaService.criarRespostaBadRequest(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 
 	private boolean campoObrigatorioNaoPreenchido(UsuarioRegisterDTO usuario) {

@@ -35,6 +35,8 @@ import br.com.agenda.barbearia.util.StringUtil;
 @RestController
 @RequestMapping("funcionarioBarbearia")
 public class FuncionarioBarbeariaController {
+	
+	ResponseEntity<?> responseEntity;
 
 	@Autowired
 	private FuncionarioBarbeariaService funcionarioBarbeariaService;
@@ -57,6 +59,7 @@ public class FuncionarioBarbeariaController {
 	
 	@PostMapping
 	public ResponseEntity<?> criarFuncionario(@RequestBody FuncionarioBarbeariaDTO funcionarioDTO) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			validarPreenchimentoDTO(funcionarioDTO);
@@ -66,18 +69,21 @@ public class FuncionarioBarbeariaController {
 			setEstabelecimentoFuncionario(funcionarioDTO, funcionarioNovo);
 			
 			funcionarioBarbeariaService.criarFuncionario(funcionarioNovo);
-			return ResponseEntity.ok(funcionarioNovo);
+			responseEntity = ResponseEntity.ok(funcionarioNovo);
 		} catch(CampoNaoPreenchidoException e) {
-			return respostaService.criarRespostaBadRequest(e.getMessage());
+			responseEntity = respostaService.criarRespostaBadRequest(e.getMessage());
 		} catch(EstabelecimentoNaoEncontradoException | UsuarioNaoEncontradoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		} catch(SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 	
 	@PutMapping("/{id}") 
 	public ResponseEntity<?> alterarFuncionario(@PathVariable Long id, @RequestBody FuncionarioBarbeariaDTO funcionarioDTO) {
+		responseEntity = null;
 		try{
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			FuncionarioBarbearia funcionario = new FuncionarioBarbearia();
@@ -86,53 +92,63 @@ public class FuncionarioBarbeariaController {
 			funcionario.setFoto(funcionarioDTO.getFoto());
 			
 			funcionarioBarbeariaService.alterarFuncionario(funcionario);
-			return ResponseEntity.ok(funcionario);		
+			responseEntity =  ResponseEntity.ok(funcionario);		
 		} catch(FuncionarioNaoEncontradoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		} catch(SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		}
 		
+		return responseEntity;
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deletarFuncionario(@PathVariable Long id) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			funcionarioBarbeariaService.deletarFuncionarioBarbearia(id);
-			return respostaService.criarRespostaSucessoRemocao("Funcionário removido com sucesso!");
+			responseEntity = respostaService.criarRespostaSucessoRemocao("Funcionário removido com sucesso!");
 		} catch(FuncionarioNaoEncontradoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		} catch(SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> buscarFuncionarioPorId(@PathVariable Long id) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			FuncionarioBarbearia funcionario = funcionarioBarbeariaService.buscarFuncionarioPorId(id);
-			return ResponseEntity.ok(funcionario);			
+			responseEntity = ResponseEntity.ok(funcionario);			
 		} catch (FuncionarioNaoEncontradoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		} catch(SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 	
 	@GetMapping("/tipo")
 	public ResponseEntity<?> buscarFuncionarioPorTipo(@RequestParam(name = "tipoUsuario") String tipoUsuarioParam) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			TipoUsuarioEnum tipoUsuario = validarEnum(tipoUsuarioParam);
 			List<FuncionarioBarbearia> funcionarios = funcionarioBarbeariaService.buscarFuncionarioPorTipo(tipoUsuario);
-			return ResponseEntity.ok(funcionarios);
+			responseEntity = ResponseEntity.ok(funcionarios);
 		} catch (FuncionarioNaoEncontradoException | TipoUsuarioNaoEncontradoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		} catch(SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 
 	private TipoUsuarioEnum validarEnum(String tipoUsuarioParam) {

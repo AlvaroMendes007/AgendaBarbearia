@@ -24,6 +24,8 @@ import br.com.agenda.barbearia.util.StringUtil;
 @RestController
 @RequestMapping("usuarios")
 public class UsuarioController {
+	
+	ResponseEntity<?> responseEntity;
 
 	@Autowired
 	private UsuarioService usuarioService;
@@ -39,21 +41,25 @@ public class UsuarioController {
 
 	@PostMapping
 	public ResponseEntity<?> criarUsuario(@RequestBody UsuarioRegisterDTO usuarioDTO) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			verificarCamposPreenchidos(usuarioDTO);
 			Usuario novoUsuario = new Usuario(usuarioDTO.getEmail(), usuarioDTO.getSenha());
 			usuarioService.criarUsuario(novoUsuario, usuarioDTO.getTipoUsuario());
-			return ResponseEntity.ok(novoUsuario);
+			responseEntity = ResponseEntity.ok(novoUsuario);
 		} catch (EmailDuplicadoException e) {
-			return respostaService.criarRespostaBadRequest(e.getMessage());
+			responseEntity = respostaService.criarRespostaBadRequest(e.getMessage());
 		} catch (SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<?> alterarUsuario(@PathVariable Long id, @RequestBody UsuarioRegisterDTO usuarioDTO) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			Usuario usuario = new Usuario();
@@ -61,26 +67,31 @@ public class UsuarioController {
 			usuario.setEmail(usuarioDTO.getEmail());
 			usuario.setSenha(usuarioDTO.getSenha());
 			usuario = usuarioService.alterarUsuario(usuario);
-			return ResponseEntity.ok(usuario);
+			responseEntity = ResponseEntity.ok(usuario);
 		} catch (UsuarioNaoEncontradoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		} catch (SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deletarUsuario(@PathVariable Long id) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			usuarioService.deletarUsuario(id);
-			return respostaService.criarRespostaSucessoRemocao("Usuário removido com sucesso!");
+			responseEntity = respostaService.criarRespostaSucessoRemocao("Usuário removido com sucesso!");
 		}
 		catch (UsuarioNaoEncontradoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		} catch (SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 
 	private void verificarCamposPreenchidos(UsuarioRegisterDTO usuarioDTO) {

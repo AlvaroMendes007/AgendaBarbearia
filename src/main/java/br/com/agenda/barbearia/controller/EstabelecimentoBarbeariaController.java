@@ -25,6 +25,8 @@ import br.com.agenda.barbearia.util.StringUtil;
 @RestController
 @RequestMapping("estabelecimentoBarbearia")
 public class EstabelecimentoBarbeariaController {
+	
+	ResponseEntity<?> responseEntity;
 
 	@Autowired
 	private EstabelecimentoBarbeariaService estabelecimentoBarbeariaService;
@@ -40,6 +42,7 @@ public class EstabelecimentoBarbeariaController {
 
 	@PostMapping
 	public ResponseEntity<?> criarEstabelecimento(@RequestBody EstabelecimentoBarbeariaDTO barbeariaDTO) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			validarCamposPreenchidosBarbearia(barbeariaDTO);
@@ -57,16 +60,19 @@ public class EstabelecimentoBarbeariaController {
 
 			EstabelecimentoBarbearia novoEstabelecimento = new EstabelecimentoBarbearia(barbeariaDTO.getNome(), enderecoBarbearia);
 			estabelecimentoBarbeariaService.criarEstabelecimentoBarbearia(novoEstabelecimento);
-			return ResponseEntity.ok(novoEstabelecimento);
+			responseEntity = ResponseEntity.ok(novoEstabelecimento);
 		} catch (SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		} catch (CampoNaoPreenchidoException e) {
-			return respostaService.criarRespostaBadRequest(e.getMessage());
+			responseEntity = respostaService.criarRespostaBadRequest(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<?> alterarEstabelecimento(@PathVariable Long id, @RequestBody EstabelecimentoBarbeariaDTO barbeariaDTO) {
+		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 	
@@ -110,12 +116,14 @@ public class EstabelecimentoBarbeariaController {
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			estabelecimentoBarbeariaService.deletarEstabelecimentoBarbearia(id);
-			return respostaService.criarRespostaSucessoRemocao("Estabelecimento removido com sucesso!");
+			responseEntity = respostaService.criarRespostaSucessoRemocao("Estabelecimento removido com sucesso!");
 		} catch(SemPermissaoExecutarAcaoException e) {
-			return respostaService.criarRespostaForbidden(e.getMessage());
+			responseEntity = respostaService.criarRespostaForbidden(e.getMessage());
 		} catch(EstabelecimentoNaoEncontradoException e) {
-			return respostaService.criarRespostaNotFound(e.getMessage());
+			responseEntity = respostaService.criarRespostaNotFound(e.getMessage());
 		}
+		
+		return responseEntity;
 	}
 
 	private void validarCamposPreenchidosBarbearia(EstabelecimentoBarbeariaDTO barbeariaDTO) {
