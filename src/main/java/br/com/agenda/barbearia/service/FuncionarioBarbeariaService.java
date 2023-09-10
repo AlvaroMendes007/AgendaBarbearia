@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
+import br.com.agenda.barbearia.exception.EstabelecimentoNaoEncontradoException;
+import br.com.agenda.barbearia.exception.FuncionarioNaoEncontradoException;
+import br.com.agenda.barbearia.exception.UsuarioNaoEncontradoException;
 import br.com.agenda.barbearia.model.FuncionarioBarbearia;
 import br.com.agenda.barbearia.repository.FuncionarioBarbeariaRepository;
 
@@ -27,7 +30,7 @@ public class FuncionarioBarbeariaService {
 	
 	public void alterarFuncionario(FuncionarioBarbearia funcionarioBarbearia) throws Exception {
 		FuncionarioBarbearia funcionarioExistente = funcionarioBarbeariaRepository.findById(funcionarioBarbearia.getId())
-				.orElseThrow(() -> new Exception("Funcionário não encontrado"));
+				.orElseThrow(() -> new FuncionarioNaoEncontradoException());
 		
 		funcionarioExistente.setNome(funcionarioBarbearia.getNome());
 		funcionarioExistente.setFoto(funcionarioBarbearia.getFoto());
@@ -39,17 +42,17 @@ public class FuncionarioBarbeariaService {
 	
 	public void deletarFuncionarioBarbearia(Long id) throws Exception {
 		FuncionarioBarbearia funcionarioExistente = funcionarioBarbeariaRepository.findById(id)
-				.orElseThrow(() -> new Exception("Funcionário não encontrado"));
+				.orElseThrow(() -> new FuncionarioNaoEncontradoException());
 		
 		funcionarioBarbeariaRepository.delete(funcionarioExistente);
 	}
 	
 	private void validacaoFuncionario(FuncionarioBarbearia funcionarioBarbearia) throws Exception {
 		if (funcionarioBarbearia.getEstabelecimentoBarbearia() == null) {
-			throw new Exception("Estabelecimento não existe!");
+			throw new EstabelecimentoNaoEncontradoException();
 		}
 		if (funcionarioBarbearia.getUsuario() == null) {
-			throw new Exception("Usuário não existe!");
+			throw new UsuarioNaoEncontradoException();
 		}
 	}
 

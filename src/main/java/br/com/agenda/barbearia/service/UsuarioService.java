@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
+import br.com.agenda.barbearia.exception.SemPermissaoExcluirTipoException;
+import br.com.agenda.barbearia.exception.SemPermissaoExecutarAcaoException;
+import br.com.agenda.barbearia.exception.UsuarioNaoEncontradoException;
 import br.com.agenda.barbearia.model.TipoUsuario;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.repository.UsuarioRepository;
@@ -45,7 +48,7 @@ public class UsuarioService {
 
 	public void alterarUsuario(Usuario usuario) throws Exception {
 		Usuario usuarioExistente = usuarioRepository.findById(usuario.getId())
-				.orElseThrow(() -> new Exception("Usuário não encontrado"));
+				.orElseThrow(() -> new UsuarioNaoEncontradoException());
 
 		String senhaCriptografada = senhaService.criptografarSenha(usuario.getSenha());
 		usuarioExistente.setEmail(usuario.getEmail());
@@ -67,10 +70,10 @@ public class UsuarioService {
 				if (tipoUsuarioBarbeiro) {
 			        usuarioRepository.delete(usuarioExistente);
 			    } else {
-			        throw new Exception("Sem permissão para excluir este tipo de usuário" + usuarioExistente.getTipoUsuario().getTipo());
+			        throw new SemPermissaoExcluirTipoException(usuarioExistente.getTipoUsuario().getTipo());
 			    }
 			} else {
-			    throw new Exception("Sem permissão para executar esta ação");
+			    throw new SemPermissaoExecutarAcaoException();
 			}
 		}
 	}

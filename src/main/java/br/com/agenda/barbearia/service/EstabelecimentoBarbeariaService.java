@@ -3,6 +3,7 @@ package br.com.agenda.barbearia.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.agenda.barbearia.exception.EstabelecimentoNaoEncontradoException;
 import br.com.agenda.barbearia.model.Endereco;
 import br.com.agenda.barbearia.model.EstabelecimentoBarbearia;
 import br.com.agenda.barbearia.repository.EstabelecimentoBarbeariaRepository;
@@ -26,7 +27,7 @@ public class EstabelecimentoBarbeariaService {
 
 	public void alterarEstabelecimentoBarbearia(EstabelecimentoBarbearia barbearia) throws Exception {
 		EstabelecimentoBarbearia barbeariaExistente = estabelecimentoBarbeariaRepository.findById(barbearia.getId())
-				.orElseThrow(() -> new Exception("Estabelecimento não encontrado"));
+				.orElseThrow(() -> new EstabelecimentoNaoEncontradoException());
 
 		barbeariaExistente.setNome(barbearia.getNome());
 		barbeariaExistente.setEnderecoBarbearia(barbearia.getEnderecoBarbearia());
@@ -36,7 +37,7 @@ public class EstabelecimentoBarbeariaService {
 
 	public void deletarEstabelecimentoBarbearia(Long id) throws Exception {
 		EstabelecimentoBarbearia barbeariaExistente = estabelecimentoBarbeariaRepository.findById(id)
-				.orElseThrow(() -> new Exception("Estabelecimento não encontrado"));
+				.orElseThrow(() -> new EstabelecimentoNaoEncontradoException());
 		
 		estabelecimentoBarbeariaRepository.delete(barbeariaExistente);
 	}
