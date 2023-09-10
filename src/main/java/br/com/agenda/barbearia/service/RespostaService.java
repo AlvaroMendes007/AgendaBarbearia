@@ -28,4 +28,11 @@ public class RespostaService {
         resposta.setMensagem(mensagem);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resposta);
     }
+
+	public ResponseEntity<?> criarRespostaRemocaoFuncionario(String mensagem) {
+		Resposta<Autenticacao> resposta = new Resposta<>();
+        resposta.setCodigo(HttpStatus.OK.value());
+        resposta.setMensagem(mensagem);
+        return ResponseEntity.status(HttpStatus.OK).body(resposta);
+	}
 }

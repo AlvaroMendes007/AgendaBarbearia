@@ -3,7 +3,6 @@ package br.com.agenda.barbearia.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,6 @@ import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
 import br.com.agenda.barbearia.exception.CampoNaoPreenchidoException;
 import br.com.agenda.barbearia.exception.FuncionarioNaoEncontradoException;
 import br.com.agenda.barbearia.exception.SemPermissaoExecutarAcaoException;
-import br.com.agenda.barbearia.model.Autenticacao;
 import br.com.agenda.barbearia.model.EstabelecimentoBarbearia;
 import br.com.agenda.barbearia.model.FuncionarioBarbearia;
 import br.com.agenda.barbearia.model.Usuario;
@@ -77,36 +75,39 @@ public class FuncionarioBarbeariaController {
 			return ResponseEntity.ok(funcionario);		
 		}
 		catch(FuncionarioNaoEncontradoException e) {
-			return respostaService.criarRespostaBadRequest(e.getMessage());
+			return respostaService.criarRespostaNotFound(e.getMessage());
 		}
 		
 	}
 	
 	@DeleteMapping("/{id}")
-	public void deletarFuncionario(@PathVariable Long id) throws Exception {
-		funcionarioBarbeariaService.deletarFuncionarioBarbearia(id);
+	public ResponseEntity<?> deletarFuncionario(@PathVariable Long id) throws Exception {
+		try {
+			funcionarioBarbeariaService.deletarFuncionarioBarbearia(id);
+			return respostaService.criarRespostaRemocaoFuncionario("Funcionário removido com sucesso!");
+		} catch(FuncionarioNaoEncontradoException e) {
+			return respostaService.criarRespostaNotFound(e.getMessage());
+		}
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<FuncionarioBarbearia> buscarFuncionarioPorId(@PathVariable Long id) {
-		FuncionarioBarbearia funcionario = funcionarioBarbeariaService.buscarFuncionarioPorId(id);
-	    
-	    if (funcionario != null) {
-	        return ResponseEntity.ok(funcionario);
-	    } else {
-	        return ResponseEntity.notFound().build();
-	    }
+	public ResponseEntity<?> buscarFuncionarioPorId(@PathVariable Long id) {
+		try {
+			FuncionarioBarbearia funcionario = funcionarioBarbeariaService.buscarFuncionarioPorId(id);
+			return ResponseEntity.ok(funcionario);			
+		} catch (FuncionarioNaoEncontradoException e) {
+			return respostaService.criarRespostaNotFound(e.getMessage());
+		}
 	}
 	
 	@GetMapping("/tipo")
-	public ResponseEntity<List<FuncionarioBarbearia>> buscarFuncionarioPorTipo(@RequestParam(name = "tipoUsuario") TipoUsuarioEnum tipoUsuario) {
-		List<FuncionarioBarbearia> funcionarios = funcionarioBarbeariaService.buscarFuncionarioPorTipo(tipoUsuario);
-	    
-	    if (!funcionarios.isEmpty()) {
-	        return ResponseEntity.ok(funcionarios);
-	    } else {
-	        return ResponseEntity.notFound().build();
-	    }
+	public ResponseEntity<?> buscarFuncionarioPorTipo(@RequestParam(name = "tipoUsuario") TipoUsuarioEnum tipoUsuario) {
+		try {
+			List<FuncionarioBarbearia> funcionarios = funcionarioBarbeariaService.buscarFuncionarioPorTipo(tipoUsuario);
+			return ResponseEntity.ok(funcionarios);
+		} catch (FuncionarioNaoEncontradoException e) {
+			return respostaService.criarRespostaNotFound(e.getMessage());
+		}
 	}
 
 	private void setEstabelecimentoFuncionario(FuncionarioBarbeariaDTO funcionarioDTO, FuncionarioBarbearia funcionarioNovo) {
