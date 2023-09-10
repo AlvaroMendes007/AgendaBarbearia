@@ -34,8 +34,6 @@ public class FuncionarioBarbeariaService {
 		
 		funcionarioExistente.setNome(funcionarioBarbearia.getNome());
 		funcionarioExistente.setFoto(funcionarioBarbearia.getFoto());
-		funcionarioExistente.setEstabelecimentoBarbearia(funcionarioBarbearia.getEstabelecimentoBarbearia());
-		funcionarioExistente.setUsuario(funcionarioBarbearia.getUsuario());
 		
        	funcionarioBarbeariaRepository.save(funcionarioExistente);
 	}
@@ -57,10 +55,16 @@ public class FuncionarioBarbeariaService {
 	}
 
 	public FuncionarioBarbearia buscarFuncionarioPorId(Long id) {
-		return funcionarioBarbeariaRepository.findById(id).orElse(null);
+		return funcionarioBarbeariaRepository.findById(id)
+				.orElseThrow(() -> new FuncionarioNaoEncontradoException());
 	}
 	
 	public List<FuncionarioBarbearia> buscarFuncionarioPorTipo(TipoUsuarioEnum tipoUsuario) {
-		return funcionarioBarbeariaRepository.findByTipo(tipoUsuario.getKey());
+	  List<FuncionarioBarbearia> funcionarios = funcionarioBarbeariaRepository.findByTipo(tipoUsuario.getKey());
+	    if (funcionarios.isEmpty()) {
+	        throw new FuncionarioNaoEncontradoException();
+	    }
+	
+	    return funcionarios;
 	}
 }

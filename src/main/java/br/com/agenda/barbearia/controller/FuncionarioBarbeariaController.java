@@ -20,6 +20,7 @@ import br.com.agenda.barbearia.exception.CampoNaoPreenchidoException;
 import br.com.agenda.barbearia.exception.EstabelecimentoNaoEncontradoException;
 import br.com.agenda.barbearia.exception.FuncionarioNaoEncontradoException;
 import br.com.agenda.barbearia.exception.SemPermissaoExecutarAcaoException;
+import br.com.agenda.barbearia.exception.TipoUsuarioNaoEncontradoException;
 import br.com.agenda.barbearia.exception.UsuarioNaoEncontradoException;
 import br.com.agenda.barbearia.model.EstabelecimentoBarbearia;
 import br.com.agenda.barbearia.model.FuncionarioBarbearia;
@@ -120,16 +121,25 @@ public class FuncionarioBarbeariaController {
 	}
 	
 	@GetMapping("/tipo")
-	public ResponseEntity<?> buscarFuncionarioPorTipo(@RequestParam(name = "tipoUsuario") TipoUsuarioEnum tipoUsuario) {
+	public ResponseEntity<?> buscarFuncionarioPorTipo(@RequestParam(name = "tipoUsuario") String tipoUsuarioParam) {
 		try {
 			validarPermissao();
+			TipoUsuarioEnum tipoUsuario = validarEnum(tipoUsuarioParam);
 			List<FuncionarioBarbearia> funcionarios = funcionarioBarbeariaService.buscarFuncionarioPorTipo(tipoUsuario);
 			return ResponseEntity.ok(funcionarios);
-		} catch (FuncionarioNaoEncontradoException e) {
+		} catch (FuncionarioNaoEncontradoException | TipoUsuarioNaoEncontradoException e) {
 			return respostaService.criarRespostaNotFound(e.getMessage());
 		} catch(SemPermissaoExecutarAcaoException e) {
 			return respostaService.criarRespostaForbidden(e.getMessage());
 		}
+	}
+
+	private TipoUsuarioEnum validarEnum(String tipoUsuarioParam) {
+		TipoUsuarioEnum tipoUsuario = TipoUsuarioEnum.fromValue(tipoUsuarioParam);
+		if (tipoUsuario == null) {
+			throw new TipoUsuarioNaoEncontradoException();
+		}
+		return tipoUsuario;
 	}
 
 	private void setEstabelecimentoFuncionario(FuncionarioBarbeariaDTO funcionarioDTO, FuncionarioBarbearia funcionarioNovo) {
