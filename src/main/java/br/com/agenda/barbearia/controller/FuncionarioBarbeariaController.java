@@ -23,10 +23,10 @@ import br.com.agenda.barbearia.exception.SemPermissaoExecutarAcaoException;
 import br.com.agenda.barbearia.model.Autenticacao;
 import br.com.agenda.barbearia.model.EstabelecimentoBarbearia;
 import br.com.agenda.barbearia.model.FuncionarioBarbearia;
-import br.com.agenda.barbearia.model.Resposta;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.service.EstabelecimentoBarbeariaService;
 import br.com.agenda.barbearia.service.FuncionarioBarbeariaService;
+import br.com.agenda.barbearia.service.RespostaService;
 import br.com.agenda.barbearia.service.UsuarioService;
 import br.com.agenda.barbearia.util.RoleUtil;
 
@@ -46,9 +46,11 @@ public class FuncionarioBarbeariaController {
 	@Autowired
 	private RoleUtil roleUtil;
 	
+	@Autowired
+	private RespostaService respostaService;
+	
 	@PostMapping
 	public ResponseEntity<?> criarFuncionario(@RequestBody FuncionarioBarbeariaDTO funcionarioDTO) throws Exception {
-		Resposta<Autenticacao> resposta = new Resposta<>();
 		try {
 			validarPreenchimentoDTO(funcionarioDTO);
 	        
@@ -59,15 +61,12 @@ public class FuncionarioBarbeariaController {
 			funcionarioBarbeariaService.criarFuncionario(funcionarioNovo);
 			return ResponseEntity.ok(funcionarioNovo);
 		} catch(CampoNaoPreenchidoException e) {
-			resposta.setCodigo(HttpStatus.BAD_REQUEST.value());
-			resposta.setMensagem(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
+			return respostaService.criarRespostaBadRequest(e.getMessage());
 		}
 	}
 	
 	@PutMapping("/{id}") 
 	public ResponseEntity<?> alterarFuncionario(@PathVariable Long id, @RequestBody FuncionarioBarbeariaDTO funcionarioDTO) throws Exception {
-		Resposta<Autenticacao> resposta = new Resposta<>();
 		try{
 			FuncionarioBarbearia funcionario = new FuncionarioBarbearia();
 			funcionario.setId(id);
@@ -78,9 +77,7 @@ public class FuncionarioBarbeariaController {
 			return ResponseEntity.ok(funcionario);		
 		}
 		catch(FuncionarioNaoEncontradoException e) {
-			resposta.setCodigo(HttpStatus.BAD_REQUEST.value());
-			resposta.setMensagem(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
+			return respostaService.criarRespostaBadRequest(e.getMessage());
 		}
 		
 	}

@@ -1,7 +1,6 @@
 package br.com.agenda.barbearia.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,9 +15,9 @@ import br.com.agenda.barbearia.exception.EmailDuplicadoException;
 import br.com.agenda.barbearia.exception.LoginInvalidoException;
 import br.com.agenda.barbearia.exception.TipoUsuarioNaoEncontradoException;
 import br.com.agenda.barbearia.model.Autenticacao;
-import br.com.agenda.barbearia.model.Resposta;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.security.TokenService;
+import br.com.agenda.barbearia.service.RespostaService;
 import br.com.agenda.barbearia.service.SenhaService;
 import br.com.agenda.barbearia.service.UsuarioService;
 import br.com.agenda.barbearia.util.StringUtil;
@@ -40,23 +39,22 @@ public class AutenticacaoController {
 
 	@Autowired
 	private StringUtil stringUtil;
+	
+	@Autowired
+	private RespostaService respostaService;
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody UsuarioLoginDTO data) {
-		Resposta<Autenticacao> resposta = new Resposta<>();
 		try {
 			Autenticacao autenticacaoLogin = validarLogin(data);
 			return ResponseEntity.ok(autenticacaoLogin);
 		} catch (LoginInvalidoException e) {
-			resposta.setCodigo(HttpStatus.NOT_FOUND.value());
-			resposta.setMensagem(e.getMessage());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resposta);
+			return respostaService.criarRespostaNotFound(e.getMessage());
 		}
 	}
 
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody UsuarioRegisterDTO data) {
-		Resposta<Autenticacao> resposta = new Resposta<>();
 		try {
 			TipoUsuarioEnum tipoUsuario = TipoUsuarioEnum.fromValue(data.getTipoUsuarioString());
 			validarCadastroUsuario(data, tipoUsuario);
@@ -65,9 +63,7 @@ public class AutenticacaoController {
 
 			return ResponseEntity.ok(usuarioCriado);
 		} catch (EmailDuplicadoException | CampoNaoPreenchidoException | TipoUsuarioNaoEncontradoException e) {
-			resposta.setCodigo(HttpStatus.BAD_REQUEST.value());
-			resposta.setMensagem(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
+			return respostaService.criarRespostaBadRequest(e.getMessage());
 		}
 	}
 
