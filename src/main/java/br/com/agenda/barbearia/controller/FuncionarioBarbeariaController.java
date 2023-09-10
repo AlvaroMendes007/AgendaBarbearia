@@ -3,6 +3,7 @@ package br.com.agenda.barbearia.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.agenda.barbearia.dto.FuncionarioBarbeariaDTO;
 import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
+import br.com.agenda.barbearia.exception.CampoNaoPreenchidoException;
+import br.com.agenda.barbearia.exception.FuncionarioNaoEncontradoException;
+import br.com.agenda.barbearia.exception.SemPermissaoExecutarAcaoException;
+import br.com.agenda.barbearia.model.Autenticacao;
 import br.com.agenda.barbearia.model.EstabelecimentoBarbearia;
 import br.com.agenda.barbearia.model.FuncionarioBarbearia;
+import br.com.agenda.barbearia.model.Resposta;
 import br.com.agenda.barbearia.model.Usuario;
 import br.com.agenda.barbearia.service.EstabelecimentoBarbeariaService;
 import br.com.agenda.barbearia.service.FuncionarioBarbeariaService;
@@ -41,25 +47,42 @@ public class FuncionarioBarbeariaController {
 	private RoleUtil roleUtil;
 	
 	@PostMapping
-	public void criarFuncionario(@RequestBody FuncionarioBarbeariaDTO funcionarioDTO) throws Exception {
-		validacaoPreenchimentoDTO(funcionarioDTO);
-        
-        FuncionarioBarbearia funcionarioNovo = setFuncionario(funcionarioDTO);
-		setUsuarioFuncionario(funcionarioDTO, funcionarioNovo);
-		setEstabelecimentoFuncionario(funcionarioDTO, funcionarioNovo);
-		
-		funcionarioBarbeariaService.criarFuncionario(funcionarioNovo);
+	public ResponseEntity<?> criarFuncionario(@RequestBody FuncionarioBarbeariaDTO funcionarioDTO) throws Exception {
+		Resposta<Autenticacao> resposta = new Resposta<>();
+		try {
+			validarPreenchimentoDTO(funcionarioDTO);
+	        
+	        FuncionarioBarbearia funcionarioNovo = setFuncionario(funcionarioDTO);
+			setUsuarioFuncionario(funcionarioDTO, funcionarioNovo);
+			setEstabelecimentoFuncionario(funcionarioDTO, funcionarioNovo);
+			
+			funcionarioBarbeariaService.criarFuncionario(funcionarioNovo);
+			return ResponseEntity.ok(funcionarioNovo);
+		} catch(CampoNaoPreenchidoException e) {
+			resposta.setCodigo(HttpStatus.BAD_REQUEST.value());
+			resposta.setMensagem(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
+		}
 	}
 	
 	@PutMapping("/{id}") 
-	public void alterarFuncionario(@PathVariable Long id, @RequestBody FuncionarioBarbeariaDTO funcionarioDTO) throws Exception {
-		FuncionarioBarbearia funcionario = new FuncionarioBarbearia();
+	public ResponseEntity<?> alterarFuncionario(@PathVariable Long id, @RequestBody FuncionarioBarbeariaDTO funcionarioDTO) throws Exception {
+		Resposta<Autenticacao> resposta = new Resposta<>();
+		try{
+			FuncionarioBarbearia funcionario = new FuncionarioBarbearia();
+			funcionario.setId(id);
+			funcionario.setNome(funcionarioDTO.getNome());
+			funcionario.setFoto(funcionarioDTO.getFoto());
+			
+			funcionarioBarbeariaService.alterarFuncionario(funcionario);
+			return ResponseEntity.ok(funcionario);		
+		}
+		catch(FuncionarioNaoEncontradoException e) {
+			resposta.setCodigo(HttpStatus.BAD_REQUEST.value());
+			resposta.setMensagem(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
+		}
 		
-		funcionario.setId(id);
-		funcionario.setNome(funcionarioDTO.getNome());
-		funcionario.setFoto(funcionarioDTO.getFoto());
-		
-		funcionarioBarbeariaService.alterarFuncionario(funcionario);
 	}
 	
 	@DeleteMapping("/{id}")
@@ -106,18 +129,18 @@ public class FuncionarioBarbeariaController {
 		return funcionarioNovo;
 	}
 
-	private void validacaoPreenchimentoDTO(FuncionarioBarbeariaDTO funcionarioDTO) throws Exception {
+	private void validarPreenchimentoDTO(FuncionarioBarbeariaDTO funcionarioDTO) throws Exception {
 		boolean usuarioTemTipoAdminBarbearia = roleUtil.possuiAdminBarbeariaRole();
         boolean usuarioTemTipoAdmin = roleUtil.possuiAdminRole();
 		
         if (!usuarioTemTipoAdmin && !usuarioTemTipoAdminBarbearia) {
-        	throw new Exception("Você não tem permissão para realizar essa ação!");
+        	throw new SemPermissaoExecutarAcaoException();
         }
         if (funcionarioDTO.getUsuarioId() == null) {
-        	throw new Exception("Usuario não preenchido");
+        	throw new CampoNaoPreenchidoException("Usuario não preenchido");
         }
         if (funcionarioDTO.getEstabelecimentoId() == null) {
-        	throw new Exception("Estabelecimento não preenchido");
+        	throw new CampoNaoPreenchidoException("Estabelecimento não preenchido");
         }
 	}
 }

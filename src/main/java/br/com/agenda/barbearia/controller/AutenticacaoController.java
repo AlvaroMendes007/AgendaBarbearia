@@ -3,7 +3,6 @@ package br.com.agenda.barbearia.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.agenda.barbearia.dto.UsuarioLoginDTO;
 import br.com.agenda.barbearia.dto.UsuarioRegisterDTO;
 import br.com.agenda.barbearia.enums.TipoUsuarioEnum;
-import br.com.agenda.barbearia.exception.CamposNaoPreenchidosException;
+import br.com.agenda.barbearia.exception.CampoNaoPreenchidoException;
 import br.com.agenda.barbearia.exception.EmailDuplicadoException;
 import br.com.agenda.barbearia.exception.LoginInvalidoException;
 import br.com.agenda.barbearia.exception.TipoUsuarioNaoEncontradoException;
@@ -27,6 +26,8 @@ import br.com.agenda.barbearia.util.StringUtil;
 @RestController
 @RequestMapping("auth")
 public class AutenticacaoController {
+
+	private static final String CAMPOS_OBRIGATORIOS_NAO_PREENCHIDOS = "Os campos obrigatórios não estão preenchidos!";
 
 	@Autowired
 	private TokenService tokenService;
@@ -63,7 +64,7 @@ public class AutenticacaoController {
 			usuarioService.criarUsuario(usuarioCriado, tipoUsuario);
 
 			return ResponseEntity.ok(usuarioCriado);
-		} catch (EmailDuplicadoException | CamposNaoPreenchidosException | TipoUsuarioNaoEncontradoException e) {
+		} catch (EmailDuplicadoException | CampoNaoPreenchidoException | TipoUsuarioNaoEncontradoException e) {
 			resposta.setCodigo(HttpStatus.BAD_REQUEST.value());
 			resposta.setMensagem(e.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
@@ -77,7 +78,7 @@ public class AutenticacaoController {
 	
 	private void validarCadastroUsuario(UsuarioRegisterDTO data, TipoUsuarioEnum tipoUsuario) {
 		if (campoObrigatorioNaoPreenchido(data)) {
-			throw new CamposNaoPreenchidosException();
+			throw new CampoNaoPreenchidoException(CAMPOS_OBRIGATORIOS_NAO_PREENCHIDOS);
 		}
 		if (tipoUsuario == null) {
 			throw new TipoUsuarioNaoEncontradoException();
