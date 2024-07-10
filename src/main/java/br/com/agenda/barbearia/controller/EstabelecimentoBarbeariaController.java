@@ -20,7 +20,7 @@ import br.com.agenda.barbearia.model.EstabelecimentoBarbearia;
 import br.com.agenda.barbearia.service.EstabelecimentoBarbeariaService;
 import br.com.agenda.barbearia.service.PermissaoService;
 import br.com.agenda.barbearia.service.RespostaService;
-import br.com.agenda.barbearia.util.StringUtil;
+import br.com.agenda.barbearia.validator.CampoPreenchidoValidator;
 
 @RestController
 @RequestMapping("estabelecimentoBarbearia")
@@ -37,16 +37,12 @@ public class EstabelecimentoBarbeariaController {
 	@Autowired
 	private RespostaService respostaService;
 
-	@Autowired
-	private StringUtil stringUtil;
-
 	@PostMapping
 	public ResponseEntity<?> criarEstabelecimento(@RequestBody EstabelecimentoBarbeariaDTO barbeariaDTO) {
 		responseEntity = null;
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
-			validarCamposPreenchidosBarbearia(barbeariaDTO);
-			validarCamposPreenchidosEnderecoBarbearia(barbeariaDTO.getEndereco());
+            CampoPreenchidoValidator.validar(barbeariaDTO);
 			EnderecoDTO enderecoDTO = new EnderecoDTO();
 			enderecoDTO = barbeariaDTO.getEndereco();
 			Endereco enderecoBarbearia = new Endereco();
@@ -93,7 +89,7 @@ public class EstabelecimentoBarbeariaController {
 		try {
 			permissaoService.verificarPermissaoAdminOuAdminBarbearia();
 			EstabelecimentoBarbearia estabelecimento = estabelecimentoBarbeariaService.buscarEstabelecimentoPorId(id);
-			validarCamposPreenchidosEnderecoBarbearia(enderecoAtualizado);
+			CampoPreenchidoValidator.validar(enderecoAtualizado);
 
 			estabelecimento.getEnderecoBarbearia().setLogradouro(enderecoAtualizado.getLogradouro());
 			estabelecimento.getEnderecoBarbearia().setCidade(enderecoAtualizado.getCidade());
@@ -124,30 +120,6 @@ public class EstabelecimentoBarbeariaController {
 		}
 		
 		return responseEntity;
-	}
-
-	private void validarCamposPreenchidosBarbearia(EstabelecimentoBarbeariaDTO barbeariaDTO) {
-		if (stringUtil.isEmpty(barbeariaDTO.getNome())) {
-			throw new CampoNaoPreenchidoException("Nome não preenchido");
-		}
-	}
-	
-	private void validarCamposPreenchidosEnderecoBarbearia(EnderecoDTO enderecoDTO) {
-		if (enderecoDTO == null) {
-			throw new CampoNaoPreenchidoException("Endereço não preenchido");
-		}
-		if (stringUtil.isEmpty(enderecoDTO.getUf())) {
-			throw new CampoNaoPreenchidoException("Estado não preenchido");
-		}
-		if (stringUtil.isEmpty(enderecoDTO.getBairro())) {
-			throw new CampoNaoPreenchidoException("Bairro não preenchido");
-		}
-		if (stringUtil.isEmpty(enderecoDTO.getCidade())) {
-			throw new CampoNaoPreenchidoException("Cidade não preenchida");
-		}
-		if (stringUtil.isEmpty(enderecoDTO.getLogradouro())) {
-			throw new CampoNaoPreenchidoException("Logradouro não preenchido");
-		}
 	}
 
 }

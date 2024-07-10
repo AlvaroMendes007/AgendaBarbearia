@@ -34,7 +34,7 @@ public class RespostaService {
 	public ResponseEntity<?> criarRespostaSucessoRemocao(String mensagem) {
 		Resposta<Autenticacao> resposta = new Resposta<>();
         resposta.setCodigo(HttpStatus.OK.value());
-        resposta.setMensagem(mensagem);
+        resposta.setMensagem(mensagem);;
         return ResponseEntity.status(HttpStatus.OK).body(resposta);
 	}
 	
