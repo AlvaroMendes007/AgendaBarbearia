@@ -19,8 +19,8 @@ public class CampoPreenchidoValidator {
     }
 
     private static void validarCampos(Object dto, List<String> camposNaoPreenchidos) {
-        Class<?> clazz = dto.getClass();
-        Field[] fields = clazz.getDeclaredFields();
+        Class<?> classDto = dto.getClass();
+        Field[] fields = classDto.getDeclaredFields();
         	
         for (Field field : fields) {
             if (field.isAnnotationPresent(ValidarCampoPreenchido.class)) {
